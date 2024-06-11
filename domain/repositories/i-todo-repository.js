@@ -36,10 +36,10 @@
     }
 
     /**
-     * @param {Todo} todo
+     * @param {string} todoId
      * @returns {Promise}
      */
-    async delete(todo) {
+    async delete(todoId) {
         throw new Error('Not implemented')
     }
 }

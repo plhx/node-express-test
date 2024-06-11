@@ -3,35 +3,36 @@
  */
 
 
-class TransactionContext {
+class Transaction {
     /**
-     *
      * @param {IDatabaseAdapter} adapter
      */
     constructor(adapter) {
-        this.adapter = adapter
+        this._adapter = adapter
     }
 
     /**
      * @param {Function} action
+     * @param {Object} options
+     * @param {string?} options.isolation
      * @returns {Promise<any>}
      */
-    async execute(action) {
-        this.adapter.run('BEGIN')
+    async execute(action, {isolation} = {}) {
+        await this._adapter.run(`BEGIN ${isolation ?? 'DEFERRED'}`)
         try {
             let result = action()
             if (result instanceof Promise) {
                 result = await result
             }
-            this.adapter.run('COMMIT')
+            await this._adapter.run('COMMIT')
             return result
         }
         catch (e) {
-            this.adapter.run('ROLLBACK')
+            await this._adapter.run('ROLLBACK')
             throw e
         }
     }
 }
 
 
-module.exports = { TransactionContext }
+module.exports = { Transaction }

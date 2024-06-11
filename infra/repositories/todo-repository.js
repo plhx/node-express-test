@@ -35,18 +35,18 @@ class TodoRepository extends ITodoRepository {
     async get(todoId) {
         const dataModel = await this._adapter.get(
             `SELECT * FROM "todo" WHERE "todo"."todo_id" = $todoId`,
-            {$todoId: todoId}
+            {
+                $todoId: todoId
+            }
         )
-        return this._toModel(dataModel)
+        return dataModel ? this._toModel(dataModel) : null
     }
 
     /**
      * @returns {Promise<Array<Todo>>}
      */
     async getAll() {
-        const dataModels = await this._adapter.all(
-            `SELECT * FROM "todo"`
-        )
+        const dataModels = await this._adapter.all(`SELECT * FROM "todo"`)
         return dataModels.map(x => this._toModel(x))
     }
 
@@ -71,11 +71,16 @@ class TodoRepository extends ITodoRepository {
     }
 
     /**
-     * @param {Todo} todo
+     * @param {string} todoId
      * @returns {Promise}
      */
-    async delete(todo) {
-        throw new Error('Not implemented')
+    async delete(todoId) {
+        await this._adapter.run(
+            `DELETE FROM "todo" WHERE "todo_id" = $todoId`,
+            {
+                $todoId: todoId,
+            }
+        )
     }
 
     /**
